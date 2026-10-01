@@ -119,7 +119,7 @@ class GitHubRepository(private val repoDao: RepoDao) {
     suspend fun searchApps(query: String, page: Int = 1): Result<List<AppItem>> = withContext(Dispatchers.IO) {
         try {
             // Search in name, description, and readme
-            val searchQuery = "$query in:name,description topic:android"
+            val searchQuery = "$query user:AXT224"
 //            val searchQuery = "$query in:name,description,readme"
             val response = api.searchRepositories(searchQuery, perPage = 40, page = page)
 
@@ -316,7 +316,7 @@ class GitHubRepository(private val repoDao: RepoDao) {
 
     suspend fun getPopularAndroidApps(page: Int = 1): Result<List<AppItem>> = withContext(Dispatchers.IO) {
         try {
-            val query = "android app topic:android stars:>100"
+            val query = "user:AXT224"
             val response = api.searchRepositories(query, perPage = 40, page = page)
 
             lastFetchTime = System.currentTimeMillis()
@@ -391,7 +391,7 @@ class GitHubRepository(private val repoDao: RepoDao) {
                     // For other categories: try each query and merge results
                     for (query in category.queries) {
                         try {
-                            val searchQuery = "$query stars:>50"
+                            val searchQuery = "user:AXT224"
                             val response = api.searchRepositories(searchQuery, perPage = 30, page = page)
                             for (repo in response.items) {
                                 if (seenIds.add(repo.id)) {
