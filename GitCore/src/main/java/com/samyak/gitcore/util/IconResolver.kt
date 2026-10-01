@@ -134,6 +134,11 @@ object IconResolver {
             else -> nativePaths + dynamicPaths + kmmPaths + crossPlatformPaths + dotnetPaths + metadataPaths + docPaths
         }
 
-        return prioritizedPaths.distinct().map { "$baseUrl/$it" }
+        val iconUrls = prioritizedPaths.distinct().map { "$baseUrl/$it" }
+
+        // Repo-specific GitHub preview used only after real icon/logo candidates fail.
+        val githubRepoPreview = "https://opengraph.githubassets.com/1/$owner/$name"
+
+        return iconUrls + githubRepoPreview
     }
 }

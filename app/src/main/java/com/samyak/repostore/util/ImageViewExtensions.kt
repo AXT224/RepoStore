@@ -19,7 +19,7 @@ fun ImageView.loadIconWithFallback(
     fallbackUrl: String,
     circleCrop: Boolean = false
 ) {
-    // Start by building the ultimate fallback (the avatar)
+    // Ultimate fallback: owner avatar, then the generic AXT Store placeholder.
     val avatarRequest = Glide.with(this)
         .load(fallbackUrl)
         .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.ALL)
@@ -46,11 +46,11 @@ fun ImageView.loadIconWithFallback(
             .let { if (circleCrop) it.circleCrop() else it }
     }
 
-    // Use the avatar as a thumbnail for instant feedback while the chain is running
+    // Use the generic placeholder while repo-specific icon discovery runs.
     currentRequest.thumbnail(
         Glide.with(this)
-            .load(fallbackUrl)
-            .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.ALL)
+            .load(R.drawable.ic_app_placeholder)
+            .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
             .let { if (circleCrop) it.circleCrop() else it }
     ).into(this)
 }
