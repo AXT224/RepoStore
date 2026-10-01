@@ -88,21 +88,17 @@ class GitHubRepository(private val repoDao: RepoDao) {
     private suspend fun filterReposWithApk(repos: List<GitHubRepo>): List<AppItem> = coroutineScope {
         val results = repos.map { repo ->
             async {
-                try {
-                    val hasApk = repoHasApk(repo.owner.login, repo.name)
-                    if (hasApk) {
-                        val release = releaseCache["${repo.owner.login}/${repo.name}"]
-                        val tag = determineTag(repo, release)
-                        AppItem(repo, release, tag, IconResolver.resolve(repo.owner.login, repo.name, repo.defaultBranch, repo.language))
-                    } else {
-                        null
-                    }
-                } catch (e: Exception) {
-                    null
-                }
+                val release = getLatestRelease(repo.owner.login, repo.name).getOrNull()
+                val tag = determineTag(repo, release)
+                AppItem(
+                    repo,
+                    release,
+                    tag,
+                    IconResolver.resolve(repo.owner.login, repo.name, repo.defaultBranch, repo.language)
+                )
             }
         }
-        results.awaitAll().filterNotNull()
+        results.awaitAll()
     }
 
     /**
@@ -151,7 +147,7 @@ class GitHubRepository(private val repoDao: RepoDao) {
         page: Int = 1
     ): Result<SearchResult> = withContext(Dispatchers.IO) {
         try {
-            val searchQuery = filters.buildQuery(query)
+            val searchQuery = "${filters.buildQuery(query)} user:AXT224"
             
             // For "Best Match", pass null to use GitHub's relevance-based sorting
             // Otherwise, use the specified sort option
